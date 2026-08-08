@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heart Animation</title>
+    <title>Heart Animation for Borsha</title>
     <style>
         * {
             margin: 0;
@@ -12,82 +12,93 @@
         }
 
         body {
-            background-color: #000;
+            background-color: #000000;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
-        }
-
-        #ui {
-            position: relative;
-            width: 300px;
-            height: 300px;
-        }
-
-        .love {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            --i: 1;
-        }
-
-        .love_horizontal {
-            animation: moveHorizontal 4s ease-in-out infinite alternate;
-            animation-delay: calc(var(--i) * -0.1s);
-        }
-
-        .love_vertical {
-            animation: moveVertical 2s ease-in-out infinite alternate;
-            animation-delay: calc(var(--i) * -0.1s);
-        }
-
-        .love_word {
-            color: #ff69b4;
             font-family: Arial, sans-serif;
-            font-size: 12px;
+        }
+
+        .heart-wrapper {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: heartPulse 3.5s ease-in-out infinite alternate;
+        }
+
+        .love-item {
+            position: absolute;
+            color: #ff3385;
+            font-size: 11px;
             font-weight: bold;
             white-space: nowrap;
-            text-shadow: 0 0 10px #ff69b4;
+            text-shadow: 0 0 8px #ff3385, 0 0 15px #ff69b4;
+            animation: slowRotate 8s linear infinite;
         }
 
-        @keyframes moveHorizontal {
-            0% { transform: translateX(-120px); }
-            50% { transform: translateX(0px); }
-            100% { transform: translateX(120px); }
+        @keyframes heartPulse {
+            0% {
+                transform: scale(0.85);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(0.9);
+            }
         }
 
-        @keyframes moveVertical {
-            0% { transform: translateY(-100px) scale(0.8); }
-            50% { transform: translateY(100px) scale(1.2); }
-            100% { transform: translateY(-100px) scale(0.8); }
+        @keyframes slowRotate {
+            0% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.8;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div id="ui"></div>
+    <div class="heart-wrapper" id="heart"></div>
 
     <script>
-        const ui = document.getElementById("ui");
-        const totalItems = 30;
+        const container = document.getElementById('heart');
+        const totalItems = 36; // সুন্দর হার্ট শেপের জন্য আদর্শ সংখ্যা
+        const scale = 11; // সাইজ
 
-        for (let i = 1; i <= totalItems; i++) {
-            const love = document.createElement("div");
-            love.className = "love";
-            love.style.setProperty("--i", i);
+        for (let i = 0; i < totalItems; i++) {
+            // ০ থেকে ২*পাই পর্যন্ত পয়েন্ট ভাগ করা
+            const t = (i / totalItems) * Math.PI * 2;
+            
+            // পারফেক্ট হার্ট ফর্মুলা
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
 
-            love.innerHTML = `
-                <div class="love_horizontal">
-                    <div class="love_vertical">
-                        <div class="love_word">I love you</div>
-                    </div>
-                </div>
-            `;
+            const posX = x * scale;
+            const posY = y * scale;
 
-            ui.appendChild(love);
+            // টেক্সটের দিক (অ্যাঙ্গেল) ঠিক রাখার হিসাব
+            const dx = 48 * Math.pow(Math.sin(t), 2) * Math.cos(t);
+            const dy = 13 * Math.sin(t) - 10 * Math.sin(2*t) - 6 * Math.sin(3*t) - 4 * Math.sin(4*t);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+            const div = document.createElement('div');
+            div.className = 'love-item';
+            div.innerText = 'I love you Borsha 💓';
+            
+            // শেপ সেট করা
+            div.style.transform = `translate(${posX}px, ${posY}px) rotate(${angle}deg)`;
+
+            container.appendChild(div);
         }
     </script>
 </body>
