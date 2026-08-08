@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heart Animation for Borsha</title>
+    <title>For Borsha</title>
     <style>
         * {
             margin: 0;
@@ -13,121 +12,107 @@
         }
 
         body {
-            /* লাইট পিঙ্ক ব্যাকগ্রাউন্ড */
             background-color: #ffe6f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 20px 0;
+            font-family: Arial, sans-serif;
         }
 
-        .heart-container {
-            position: relative;
-            width: 380px;
-            height: 380px;
+        .row {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            /* হালকা বাম থেকে ডানে ওভারঅল মোশন */
-            animation: containerSlide 8s ease-in-out infinite alternate;
-        }
-
-        .love-card {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 3px 8px;
-            border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            border: 1px solid rgba(147, 112, 219, 0.3);
-            /* ডার্ক পার্পল কালার */
-            color: #4a0e4e;
-            font-size: 11px;
-            font-weight: 700;
+            width: 100%;
+            overflow: hidden;
             white-space: nowrap;
-            /* বাম থেকে ডান দিকে স্মুথ মুভমেন্ট */
-            animation: moveLeftToRight 4s ease-in-out infinite alternate;
         }
 
-        /* ছোট কিন্তু ক্লিয়ার ছবি */
-        .card-img {
-            width: 20px;
-            height: 20px;
+        .row-content {
+            display: flex;
+            gap: 20px;
+            animation-duration: 18s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        /* বাম থেকে ডান */
+        .left-to-right {
+            animation-name: moveRight;
+        }
+
+        /* ডান থেকে বাম */
+        .right-to-left {
+            animation-name: moveLeft;
+        }
+
+        .card {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 6px 14px;
+            border-radius: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            color: #4a0e4e;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .card img {
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid #8e24aa;
+            border: 1.5px solid #8e24aa;
         }
 
-        @keyframes moveLeftToRight {
-            0% {
-                transform: translateX(-10px) rotate(var(--rot));
-            }
-            100% {
-                transform: translateX(10px) rotate(var(--rot));
-            }
+        @keyframes moveRight {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
         }
 
-        @keyframes containerSlide {
-            0% {
-                transform: scale(0.95) translateX(-15px);
-            }
-            100% {
-                transform: scale(1.02) translateX(15px);
-            }
+        @keyframes moveLeft {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
         }
     </style>
 </head>
 <body>
 
-    <div class="heart-container" id="heart"></div>
-
     <script>
-        const container = document.getElementById('heart');
-        const totalItems = 28; // হিজিবিজি এড়াতে সুন্দর ব্যালেন্সড সংখ্যা
-        const scale = 11;
-
-        // আপনার শেয়ার করা ছবিগুলোর লিংক (ডেমো হিসেবে দেওয়া, নিজের ইমেজের ডিটেইল বসাতে পারবেন)
         const images = [
-            'https://ibb.co.com/C5BfFWm2',
-            'https://ibb.co.com/1tP6Gv9n',
-            'https://ibb.co.com/Nn16nLnk'
+            '[![3b20a594a2b327f35a5c98a62a648600-0-2.jpg](https://i.postimg.cc/xT08Jw2Q/3b20a594a2b327f35a5c98a62a648600-0-2.jpg)](https://postimg.cc/CdQS965r)',
+            'https://postimg.cc/2bdThttP'
         ];
 
-        for (let i = 0; i < totalItems; i++) {
-            const t = (i / totalItems) * Math.PI * 2;
-            
-            // পারফেক্ট হার্ট ফর্মুলা
-            const x = 16 * Math.pow(Math.sin(t), 3);
-            const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+        const totalRows = 9; // স্ক্রিনে কতগুলো লাইন থাকবে
 
-            const posX = x * scale;
-            const posY = y * scale;
+        for (let r = 0; r < totalRows; r++) {
+            const row = document.createElement('div');
+            row.className = 'row';
 
-            // এঙ্গেল ক্যালকুলেশন
-            const dx = 48 * Math.pow(Math.sin(t), 2) * Math.cos(t);
-            const dy = 13 * Math.sin(t) - 10 * Math.sin(2*t) - 6 * Math.sin(3*t) - 4 * Math.sin(4*t);
-            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            const content = document.createElement('div');
+            // অল্টারনেট করে বাম-ডান অ্যানিমেশন সেট
+            const directionClass = (r % 2 === 0) ? 'left-to-right' : 'right-to-left';
+            content.className = `row-content ${directionClass}`;
 
-            const card = document.createElement('div');
-            card.className = 'love-card';
-            
-            // রোটেশন ভ্যারিয়েবল সেট
-            card.style.setProperty('--rot', `${angle}deg`);
-            card.style.transform = `translate(${posX}px, ${posY}px) rotate(${angle}deg)`;
-            card.style.animationDelay = `${(i / totalItems) * -3}s`;
+            // নিরবচ্ছিন্ন চলাচলের জন্য ডাবল কার্ড তৈরি
+            let cardsHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const imgUrl = images[i % images.length];
+                cardsHTML += `
+                    <div class="card">
+                        <img src="${imgUrl}" alt="Borsha">
+                        <span>I love you Borsha 💓</span>
+                    </div>
+                `;
+            }
 
-            const imgUrl = images[i % images.length];
-
-            card.innerHTML = `
-                <img src="${imgUrl}" class="card-img" alt="Borsha">
-                <span>I love you Borsha 💓</span>
-            `;
-
-            container.appendChild(card);
+            content.innerHTML = cardsHTML + cardsHTML; // স্মুথ লুপের জন্য ডুপ্লিকেট
+            row.appendChild(content);
+            document.body.appendChild(row);
         }
     </script>
 </body>
