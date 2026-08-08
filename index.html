@@ -1,132 +1,583 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Particle Heart Animation</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I Love You Borsha ❤️</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Great+Vibes&display=swap');
 
-        body {
-            background-color: #000;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-    </style>
+    body {
+      height: 100vh;
+      overflow: hidden;
+      background: #f5a26f; /* Demo er moto peach color */
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 420px;
+      background: #f5a26f;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    }
+
+    /* Character (Clown style) */
+    .character {
+      position: absolute;
+      font-size: 78px;
+      left: -120px;
+      bottom: 70px;
+      z-index: 20;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2));
+    }
+
+    /* Gift Box */
+    .gift {
+      position: absolute;
+      width: 110px;
+      height: 95px;
+      left: 50%;
+      bottom: 75px;
+      transform: translateX(-50%) scale(0);
+      opacity: 0;
+      z-index: 15;
+    }
+
+    .gift-body {
+      width: 110px;
+      height: 70px;
+      background: linear-gradient(145deg, #e63946, #ff4d6d);
+      border-radius: 10px;
+      position: relative;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .gift-lid {
+      width: 122px;
+      height: 32px;
+      background: linear-gradient(145deg, #ff9f1c, #ffbf69);
+      border-radius: 8px 8px 4px 4px;
+      position: absolute;
+      top: -22px;
+      left: -6px;
+      transform-origin: bottom center;
+    }
+
+    .ribbon {
+      position: absolute;
+      width: 22px;
+      height: 70px;
+      background: #fff;
+      left: 44px;
+      top: 0;
+      z-index: 2;
+    }
+    .ribbon::after {
+      content: '';
+      position: absolute;
+      width: 110px;
+      height: 18px;
+      background: #fff;
+      top: 26px;
+      left: -44px;
+    }
+
+    /* Photo */
+    .photo-box {
+      position: absolute;
+      left: 50%;
+      bottom: 110px;
+      transform: translateX(-50%) scale(0);
+      opacity: 0;
+      z-index: 25;
+    }
+
+    .photo-box img {
+      width: 210px;
+      height: 210px;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 6px solid #fff;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    }
+
+    /* Love Text */
+    .love-text {
+      position: absolute;
+      bottom: 25px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .love-text h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 42px;
+      color: #fff;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .love-text h1 span {
+      color: #ffe566;
+    }
+
+    /* Start Button */
+    #startBtn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      background: #e63946;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(230, 57, 70, 0.4);
+      z-index: 100;
+      transition: 0.3s;
+    }
+    #startBtn:hover {
+      transform: translate(-50%, -50%) scale(1.07);
+    }
+    #startBtn.hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
-    <canvas id="canvas"></canvas>
+  <div class="stage" id="stage">
+    <button id="startBtn">❤️ Start</button>
 
-    <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+    <!-- Character -->
+    <div class="character" id="character">🤡</div>
 
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
+    <!-- Gift Box -->
+    <div class="gift" id="gift">
+      <div class="gift-lid" id="lid"></div>
+      <div class="gift-body">
+        <div class="ribbon"></div>
+      </div>
+    </div>
 
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
+    <!-- Photo -->
+    <div class="photo-box" id="photoBox">
+      <img src="https://i.postimg.cc/63gSJJf5/RIYAN-20260713-235752-Portrait-Click-(warm)by-Riyan-3-(2).jpg" alt="Borsha">
+    </div>
 
-        // Heart mathematical parametric equation
-        function getHeartPoint(t) {
-            const x = 16 * Math.pow(Math.sin(t), 3);
-            const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-            return { x, y };
-        }
+    <!-- Text -->
+    <div class="love-text" id="loveText">
+      <h1>I Love You <span>Borsha</span></h1>
+    </div>
+  </div>
 
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.size = Math.random() * 2 + 1;
-                this.vx = (Math.random() - 0.5) * 2;
-                this.vy = (Math.random() - 0.5) * 2;
-                this.alpha = 1;
-                this.color = color;
-            }
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const character = document.getElementById('character');
+    const gift = document.getElementById('gift');
+    const lid = document.getElementById('lid');
+    const photoBox = document.getElementById('photoBox');
+    const loveText = document.getElementById('loveText');
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.alpha -= 0.01;
-            }
+    startBtn.addEventListener('click', () => {
+      startBtn.classList.add('hidden');
+      runAnimation();
+    });
 
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = this.color;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
+    function runAnimation() {
+      const tl = gsap.timeline();
 
-        let step = 0;
-        const particles = [];
+      // 1. Character walks in from left
+      tl.to(character, {
+        left: 80,
+        duration: 1.8,
+        ease: "power2.out"
+      });
 
-        function animate() {
-            // Motion blur effect for trail
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-            ctx.fillRect(0, 0, width, height);
+      // 2. Gift box appears (character "places" it)
+      tl.to(gift, {
+        scale: 1,
+        opacity: 1,
+        duration: 0.6,
+        ease: "back.out(1.7)"
+      }, "-=0.4");
 
-            // Calculate current leading particle position
-            const point = getHeartPoint(step);
-            const scale = Math.min(width, height) / 40;
-            const targetX = width / 2 + point.x * scale;
-            const targetY = height / 2 + point.y * scale;
+      // 3. Character moves to center & sits on box
+      tl.to(character, {
+        left: "50%",
+        xPercent: -50,
+        bottom: 145,
+        duration: 1.1,
+        ease: "power2.inOut"
+      });
 
-            // Dynamic color shift (Neon Pink/Purple/Green/Orange cycle)
-            const hue = (step * 50) % 360;
-            const neonColor = `hsl(${hue}, 100%, 65%)`;
+      // 4. Box shaking
+      tl.to(gift, {
+        keyframes: [
+          { x: -10, rotation: -4, duration: 0.07 },
+          { x: 10, rotation: 4, duration: 0.07 },
+          { x: -8, rotation: -3, duration: 0.07 },
+          { x: 8, rotation: 3, duration: 0.07 },
+          { x: -6, rotation: -2, duration: 0.07 },
+          { x: 6, rotation: 2, duration: 0.07 },
+          { x: 0, rotation: 0, duration: 0.1 }
+        ],
+        repeat: 4
+      });
 
-            // Draw glowing head
-            ctx.save();
-            ctx.shadowBlur = 25;
-            ctx.shadowColor = neonColor;
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            ctx.arc(targetX, targetY, 4, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
+      // 5. Character falls
+      tl.to(character, {
+        left: "78%",
+        bottom: 40,
+        rotation: 110,
+        duration: 0.85,
+        ease: "power2.in"
+      }, "-=0.2");
 
-            // Emit burst particles
-            for (let i = 0; i < 5; i++) {
-                particles.push(new Particle(targetX, targetY, neonColor));
-            }
+      // 6. Lid opens
+      tl.to(lid, {
+        rotationX: -125,
+        y: -15,
+        duration: 0.9,
+        ease: "back.out(1.5)"
+      });
 
-            // Update & render particles
-            for (let i = particles.length - 1; i >= 0; i--) {
-                particles[i].update();
-                particles[i].draw();
-                if (particles[i].alpha <= 0) {
-                    particles.splice(i, 1);
-                }
-            }
+      // 7. Photo comes out
+      tl.to(photoBox, {
+        scale: 1,
+        opacity: 1,
+        bottom: 130,
+        duration: 1.3,
+        ease: "back.out(1.4)"
+      }, "-=0.3");
 
-            step += 0.03;
-            requestAnimationFrame(animate);
-        }
+      // Photo gentle float
+      tl.to(photoBox, {
+        y: -12,
+        duration: 1.6,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut"
+      }, "-=0.6");
 
-        animate();
-    </script>
+      // 8. Love text
+      tl.to(loveText, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out"
+      }, "-=0.8");
+    }
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I Love You Borsha ❤️</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Great+Vibes&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      background: #f5a26f; /* Demo er moto peach color */
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 420px;
+      background: #f5a26f;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    }
+
+    /* Character (Clown style) */
+    .character {
+      position: absolute;
+      font-size: 78px;
+      left: -120px;
+      bottom: 70px;
+      z-index: 20;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2));
+    }
+
+    /* Gift Box */
+    .gift {
+      position: absolute;
+      width: 110px;
+      height: 95px;
+      left: 50%;
+      bottom: 75px;
+      transform: translateX(-50%) scale(0);
+      opacity: 0;
+      z-index: 15;
+    }
+
+    .gift-body {
+      width: 110px;
+      height: 70px;
+      background: linear-gradient(145deg, #e63946, #ff4d6d);
+      border-radius: 10px;
+      position: relative;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .gift-lid {
+      width: 122px;
+      height: 32px;
+      background: linear-gradient(145deg, #ff9f1c, #ffbf69);
+      border-radius: 8px 8px 4px 4px;
+      position: absolute;
+      top: -22px;
+      left: -6px;
+      transform-origin: bottom center;
+    }
+
+    .ribbon {
+      position: absolute;
+      width: 22px;
+      height: 70px;
+      background: #fff;
+      left: 44px;
+      top: 0;
+      z-index: 2;
+    }
+    .ribbon::after {
+      content: '';
+      position: absolute;
+      width: 110px;
+      height: 18px;
+      background: #fff;
+      top: 26px;
+      left: -44px;
+    }
+
+    /* Photo */
+    .photo-box {
+      position: absolute;
+      left: 50%;
+      bottom: 110px;
+      transform: translateX(-50%) scale(0);
+      opacity: 0;
+      z-index: 25;
+    }
+
+    .photo-box img {
+      width: 210px;
+      height: 210px;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 6px solid #fff;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    }
+
+    /* Love Text */
+    .love-text {
+      position: absolute;
+      bottom: 25px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .love-text h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 42px;
+      color: #fff;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .love-text h1 span {
+      color: #ffe566;
+    }
+
+    /* Start Button */
+    #startBtn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      background: #e63946;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(230, 57, 70, 0.4);
+      z-index: 100;
+      transition: 0.3s;
+    }
+    #startBtn:hover {
+      transform: translate(-50%, -50%) scale(1.07);
+    }
+    #startBtn.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stage" id="stage">
+    <button id="startBtn">❤️ Start</button>
+
+    <!-- Character -->
+    <div class="character" id="character">🤡</div>
+
+    <!-- Gift Box -->
+    <div class="gift" id="gift">
+      <div class="gift-lid" id="lid"></div>
+      <div class="gift-body">
+        <div class="ribbon"></div>
+      </div>
+    </div>
+
+    <!-- Photo -->
+    <div class="photo-box" id="photoBox">
+      <img src="https://i.postimg.cc/63gSJJf5/RIYAN-20260713-235752-Portrait-Click-(warm)by-Riyan-3-(2).jpg" alt="Borsha">
+    </div>
+
+    <!-- Text -->
+    <div class="love-text" id="loveText">
+      <h1>I Love You <span>Borsha</span></h1>
+    </div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const character = document.getElementById('character');
+    const gift = document.getElementById('gift');
+    const lid = document.getElementById('lid');
+    const photoBox = document.getElementById('photoBox');
+    const loveText = document.getElementById('loveText');
+
+    startBtn.addEventListener('click', () => {
+      startBtn.classList.add('hidden');
+      runAnimation();
+    });
+
+    function runAnimation() {
+      const tl = gsap.timeline();
+
+      // 1. Character walks in from left
+      tl.to(character, {
+        left: 80,
+        duration: 1.8,
+        ease: "power2.out"
+      });
+
+      // 2. Gift box appears (character "places" it)
+      tl.to(gift, {
+        scale: 1,
+        opacity: 1,
+        duration: 0.6,
+        ease: "back.out(1.7)"
+      }, "-=0.4");
+
+      // 3. Character moves to center & sits on box
+      tl.to(character, {
+        left: "50%",
+        xPercent: -50,
+        bottom: 145,
+        duration: 1.1,
+        ease: "power2.inOut"
+      });
+
+      // 4. Box shaking
+      tl.to(gift, {
+        keyframes: [
+          { x: -10, rotation: -4, duration: 0.07 },
+          { x: 10, rotation: 4, duration: 0.07 },
+          { x: -8, rotation: -3, duration: 0.07 },
+          { x: 8, rotation: 3, duration: 0.07 },
+          { x: -6, rotation: -2, duration: 0.07 },
+          { x: 6, rotation: 2, duration: 0.07 },
+          { x: 0, rotation: 0, duration: 0.1 }
+        ],
+        repeat: 4
+      });
+
+      // 5. Character falls
+      tl.to(character, {
+        left: "78%",
+        bottom: 40,
+        rotation: 110,
+        duration: 0.85,
+        ease: "power2.in"
+      }, "-=0.2");
+
+      // 6. Lid opens
+      tl.to(lid, {
+        rotationX: -125,
+        y: -15,
+        duration: 0.9,
+        ease: "back.out(1.5)"
+      });
+
+      // 7. Photo comes out
+      tl.to(photoBox, {
+        scale: 1,
+        opacity: 1,
+        bottom: 130,
+        duration: 1.3,
+        ease: "back.out(1.4)"
+      }, "-=0.3");
+
+      // Photo gentle float
+      tl.to(photoBox, {
+        y: -12,
+        duration: 1.6,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut"
+      }, "-=0.6");
+
+      // 8. Love text
+      tl.to(loveText, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out"
+      }, "-=0.8");
+    }
+  </script>
 </body>
 </html>
