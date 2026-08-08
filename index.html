@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Borsha</title>
+    <title>3D Interactive Animation for Borsha</title>
     <style>
         * {
             margin: 0;
@@ -12,108 +12,144 @@
         }
 
         body {
+            /* লাইট পিঙ্ক ব্যাকগ্রাউন্ড */
             background-color: #ffe6f0;
             min-height: 100vh;
-            overflow: hidden;
             display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            padding: 20px 0;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
             font-family: Arial, sans-serif;
+            touch-action: none; /* হাত দিয়ে ঘোরানোর জন্য */
         }
 
-        .row {
+        .viewport {
+            perspective: 1000px;
+            width: 100vw;
+            height: 100vh;
             display: flex;
-            width: 100%;
-            overflow: hidden;
-            white-space: nowrap;
+            justify-content: center;
+            align-items: center;
         }
 
-        .row-content {
+        .world {
+            position: relative;
+            width: 0;
+            height: 0;
+            transform-style: preserve-3d;
+        }
+
+        /* কোনো সাদা বক্স নেই, সরাসরি স্বচ্ছ ব্যাকগ্রাউন্ড */
+        .item {
+            position: absolute;
             display: flex;
-            gap: 20px;
-            animation-duration: 18s;
-            animation-timing-function: linear;
-            animation-iteration-count: infinite;
-        }
-
-        /* বাম থেকে ডান */
-        .left-to-right {
-            animation-name: moveRight;
-        }
-
-        /* ডান থেকে বাম */
-        .right-to-left {
-            animation-name: moveLeft;
-        }
-
-        .card {
-            display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 6px 14px;
-            border-radius: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            color: #4a0e4e;
+            background: transparent;
+            color: #4a0e4e; /* গাঢ় বেগুনি টেক্সট */
             font-size: 13px;
             font-weight: bold;
+            white-space: nowrap;
+            transform-style: preserve-3d;
+            user-select: none;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
         }
 
-        .card img {
-            width: 24px;
-            height: 24px;
+        /* সুন্দর গোল ছবি (Base64 ডেমো দিয়ে টেস্ট করা যাতে লিংক ব্লক না হয়) */
+        .item img {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1.5px solid #8e24aa;
-        }
-
-        @keyframes moveRight {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0%); }
-        }
-
-        @keyframes moveLeft {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
+            border: 2px solid #8e24aa;
+            box-shadow: 0 0 8px rgba(142, 36, 170, 0.4);
         }
     </style>
 </head>
 <body>
 
+    <div class="viewport" id="viewport">
+        <div class="world" id="world"></div>
+    </div>
+
     <script>
-        const images = [
-            '[![3b20a594a2b327f35a5c98a62a648600-0-2.jpg](https://i.postimg.cc/xT08Jw2Q/3b20a594a2b327f35a5c98a62a648600-0-2.jpg)](https://postimg.cc/CdQS965r)',
-            'https://postimg.cc/2bdThttP'
-        ];
+        const world = document.getElementById('world');
+        const viewport = document.getElementById('viewport');
 
-        const totalRows = 9; // স্ক্রিনে কতগুলো লাইন থাকবে
+        // আপনার আসল ইমেজের লিংক থাকলে এই অ্যারেতে বসাতে পারবেন
+        const sampleImage = '[![3b20a594a2b327f35a5c98a62a648600-0-2.jpg](https://i.postimg.cc/xT08Jw2Q/3b20a594a2b327f35a5c98a62a648600-0-2.jpg)](https://postimg.cc/CdQS965r);
+        const totalItems = 40; 
+        const radius = 180; // 3D স্পেসের সাইজ
 
-        for (let r = 0; r < totalRows; r++) {
-            const row = document.createElement('div');
-            row.className = 'row';
+        // 3D গ্লোব পজিশনিং
+        for (let i = 0; i < totalItems; i++) {
+            const phi = Math.acos(-1 + (2 * i) / totalItems);
+            const theta = Math.sqrt(totalItems * Math.PI) * phi;
 
-            const content = document.createElement('div');
-            // অল্টারনেট করে বাম-ডান অ্যানিমেশন সেট
-            const directionClass = (r % 2 === 0) ? 'left-to-right' : 'right-to-left';
-            content.className = `row-content ${directionClass}`;
+            const x = radius * Math.cos(theta) * Math.sin(phi);
+            const y = radius * Math.sin(theta) * Math.sin(phi);
+            const z = radius * Math.cos(phi);
 
-            // নিরবচ্ছিন্ন চলাচলের জন্য ডাবল কার্ড তৈরি
-            let cardsHTML = '';
-            for (let i = 0; i < 10; i++) {
-                const imgUrl = images[i % images.length];
-                cardsHTML += `
-                    <div class="card">
-                        <img src="${imgUrl}" alt="Borsha">
-                        <span>I love you Borsha 💓</span>
-                    </div>
-                `;
-            }
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
 
-            content.innerHTML = cardsHTML + cardsHTML; // স্মুথ লুপের জন্য ডুপ্লিকেট
-            row.appendChild(content);
-            document.body.appendChild(row);
+            div.innerHTML = `
+                <img src="${sampleImage}" alt="Pic">
+                <span>I love you Borsha 💓</span>
+            `;
+
+            world.appendChild(div);
         }
+
+        // হাত বা মাউস দিয়ে 3D ড্র্যাগ/ঘোরানোর লজিক
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let rotation = { x: 0, y: 0 };
+
+        function updateRotation() {
+            world.style.transform = `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`;
+        }
+
+        // অটোমেটিক ধীরে ধীরে ঘোরার অ্যানিমেশন
+        function autoRotate() {
+            if (!isDragging) {
+                rotation.y += 0.3;
+                updateRotation();
+            }
+            requestAnimationFrame(autoRotate);
+        }
+        autoRotate();
+
+        // টচ ও মাউস ইভেন্ট কন্ট্রোল
+        const startDrag = (x, y) => {
+            isDragging = true;
+            previousMousePosition = { x, y };
+        };
+
+        const moveDrag = (x, y) => {
+            if (!isDragging) return;
+            const deltaX = x - previousMousePosition.x;
+            const deltaY = y - previousMousePosition.y;
+
+            rotation.y += deltaX * 0.5;
+            rotation.x -= deltaY * 0.5;
+
+            updateRotation();
+            previousMousePosition = { x, y };
+        };
+
+        const stopDrag = () => { isDragging = false; };
+
+        // মাউস ইভেন্ট
+        viewport.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+        window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+        window.addEventListener('mouseup', stopDrag);
+
+        // মোবাইল টাচ ইভেন্ট (হাত দিয়ে ঘোরানোর জন্য)
+        viewport.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY));
+        window.addEventListener('touchmove', (e) => moveDrag(e.touches[0].clientX, e.touches[0].clientY));
+        window.addEventListener('touchend', stopDrag);
     </script>
 </body>
 </html>
