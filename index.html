@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,93 +12,99 @@
         }
 
         body {
-            background-color: #000000;
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            color: #ff3385; /* Pink Text */
             font-family: Arial, sans-serif;
+            perspective: 1000px;
         }
 
-        .heart-wrapper {
+        #ui {
             position: relative;
-            width: 350px;
-            height: 350px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: heartPulse 3.5s ease-in-out infinite alternate;
+            width: 300px;
+            height: 300px;
+            transform-style: preserve-3d;
+            animation: containerRotation 20s linear infinite; /* Optional entire shape rotation */
         }
 
-        .love-item {
+        .love {
             position: absolute;
-            color: #ff3385;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .love_word {
+            /* লেখার সাইজ ছোট করা হয়েছে (১১ পিক্সেল) */
             font-size: 11px;
             font-weight: bold;
             white-space: nowrap;
-            text-shadow: 0 0 8px #ff3385, 0 0 15px #ff69b4;
-            animation: slowRotate 8s linear infinite;
+            /* লেখার উজ্জ্বলতা কমানো হয়েছে (টেক্সট শ্যাডো কমিয়ে) */
+            text-shadow: 0 0 5px rgba(255, 51, 133, 0.7);
+            /* ঘূর্ণন অ্যানিমেশন যোগ করা হয়েছে */
+            animation: drawTrail 8s ease-in-out infinite alternate;
         }
 
-        @keyframes heartPulse {
+        /* এই অ্যানিমেশনটি প্রতিটি লেখাকে ঘোরাবে */
+        @keyframes drawTrail {
             0% {
-                transform: scale(0.85);
+                transform: rotateY(0deg) scale(0);
+                opacity: 0;
             }
-            50% {
-                transform: scale(1.05);
+            10% {
+                opacity: 1;
+                transform: rotateY(36deg) scale(1);
             }
             100% {
-                transform: scale(0.9);
-            }
-        }
-
-        @keyframes slowRotate {
-            0% {
-                opacity: 0.8;
-            }
-            50% {
+                transform: rotateY(360deg) scale(1.1);
                 opacity: 1;
             }
+        }
+
+        /* চাইলে পুরো হার্ট শেপটিকেও ধীরে ঘোরাতে পারেন */
+        @keyframes containerRotation {
+            0% {
+                transform: rotateY(0deg);
+            }
             100% {
-                opacity: 0.8;
+                transform: rotateY(360deg);
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="heart-wrapper" id="heart"></div>
+    <div id="ui"></div>
 
     <script>
-        const container = document.getElementById('heart');
-        const totalItems = 36; // সুন্দর হার্ট শেপের জন্য আদর্শ সংখ্যা
-        const scale = 11; // সাইজ
+        const container = document.getElementById('ui');
+        const totalItems = 30; // হার্ট শেপ গঠনের জন্য লেখা
 
-        for (let i = 0; i < totalItems; i++) {
-            // ০ থেকে ২*পাই পর্যন্ত পয়েন্ট ভাগ করা
-            const t = (i / totalItems) * Math.PI * 2;
+        for (let i = 1; i <= totalItems; i++) {
+            const love = document.createElement('div');
+            love.className = 'love';
             
-            // পারফেক্ট হার্ট ফর্মুলা
+            // হার্ট শেপের গাণিতিক ফর্মুলা (আগের কোডের মতো)
+            const t = (i / totalItems) * Math.PI * 2;
             const x = 16 * Math.pow(Math.sin(t), 3);
             const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
 
-            const posX = x * scale;
-            const posY = y * scale;
+            const scaleFactor = 10; // হার্ট সাইজ (অ্যাডজাস্ট করুন)
+            const posX = x * scaleFactor;
+            const posY = y * scaleFactor;
 
-            // টেক্সটের দিক (অ্যাঙ্গেল) ঠিক রাখার হিসাব
-            const dx = 48 * Math.pow(Math.sin(t), 2) * Math.cos(t);
-            const dy = 13 * Math.sin(t) - 10 * Math.sin(2*t) - 6 * Math.sin(3*t) - 4 * Math.sin(4*t);
-            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-
-            const div = document.createElement('div');
-            div.className = 'love-item';
-            div.innerText = 'I love you Borsha 💓';
+            love.style.left = `calc(50% + ${posX}px)`;
+            love.style.top = `calc(50% + ${posY}px)`;
             
-            // শেপ সেট করা
-            div.style.transform = `translate(${posX}px, ${posY}px) rotate(${angle}deg)`;
+            // প্রতিটি লেখার জন্য আলাদা করে বিলম্ব (delay) যোগ করা হয়েছে যাতে একটি ট্রেইল তৈরি হয়
+            const animationDelay = (i / totalItems) * -8; // -8s, 0.75-এর মতো ধীরে
+            love.innerHTML = `<div class="love_word" style="animation-delay: ${animationDelay}s">I love you Borsha 💓</div>`;
 
-            container.appendChild(div);
+            container.appendChild(love);
         }
     </script>
 </body>
