@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Interactive Animation for Borsha</title>
+    <title>For Borsha</title>
     <style>
+        :root {
+            --pink-bg: #e63956;
+            --ink: #ffffff;
+            --bar-bg: #12040b;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,144 +18,88 @@
         }
 
         body {
-            /* লাইট পিঙ্ক ব্যাকগ্রাউন্ড */
-            background-color: #ffe6f0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            touch-action: none; /* হাত দিয়ে ঘোরানোর জন্য */
-        }
-
-        .viewport {
-            perspective: 1000px;
-            width: 100vw;
+            background-color: var(--pink-bg);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
+            font-family: 'Playfair Display', 'Georgia', serif;
         }
 
-        .world {
-            position: relative;
-            width: 0;
-            height: 0;
-            transform-style: preserve-3d;
-        }
-
-        /* কোনো সাদা বক্স নেই, সরাসরি স্বচ্ছ ব্যাকগ্রাউন্ড */
-        .item {
+        /* Cinematic Top and Bottom Bars */
+        .bar {
             position: absolute;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: transparent;
-            color: #4a0e4e; /* গাঢ় বেগুনি টেক্সট */
-            font-size: 13px;
-            font-weight: bold;
-            white-space: nowrap;
-            transform-style: preserve-3d;
-            user-select: none;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            left: 0;
+            right: 0;
+            height: 16vh;
+            background: var(--bar-bg);
+            z-index: 3;
+            will-change: transform;
+            pointer-events: none;
         }
 
-        /* সুন্দর গোল ছবি (Base64 ডেমো দিয়ে টেস্ট করা যাতে লিংক ব্লক না হয়) */
-        .item img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #8e24aa;
-            box-shadow: 0 0 8px rgba(142, 36, 170, 0.4);
+        .bar--top {
+            top: 0;
+        }
+
+        .bar--bot {
+            bottom: 0;
+        }
+
+        /* Wish Subtitle Text */
+        .sub-text {
+            position: absolute;
+            top: -30px;
+            left: 5px;
+            font-size: 14px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 2px;
+            font-family: sans-serif;
+        }
+
+        /* Main Container */
+        .wish-container {
+            position: relative;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .wish {
+            position: relative;
+            color: var(--ink);
+            font-size: clamp(2.5rem, 8vw, 5.5rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            animation: textGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            0% {
+                transform: scale(0.98);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(1.02);
+                opacity: 1;
+                text-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="viewport" id="viewport">
-        <div class="world" id="world"></div>
+    <!-- Cinematic Bars -->
+    <div class="bar bar--top"></div>
+    <div class="bar bar--bot"></div>
+
+    <!-- Main Interactive Wish -->
+    <div class="wish-container">
+        <span class="sub-text">make a wish..</span>
+        <h1 class="wish">I love you Borsha</h1>
     </div>
 
-    <script>
-        const world = document.getElementById('world');
-        const viewport = document.getElementById('viewport');
-
-        // আপনার আসল ইমেজের লিংক থাকলে এই অ্যারেতে বসাতে পারবেন
-        const sampleImage = '[![3b20a594a2b327f35a5c98a62a648600-0-2.jpg](https://i.postimg.cc/xT08Jw2Q/3b20a594a2b327f35a5c98a62a648600-0-2.jpg)](https://postimg.cc/CdQS965r);
-        const totalItems = 40; 
-        const radius = 180; // 3D স্পেসের সাইজ
-
-        // 3D গ্লোব পজিশনিং
-        for (let i = 0; i < totalItems; i++) {
-            const phi = Math.acos(-1 + (2 * i) / totalItems);
-            const theta = Math.sqrt(totalItems * Math.PI) * phi;
-
-            const x = radius * Math.cos(theta) * Math.sin(phi);
-            const y = radius * Math.sin(theta) * Math.sin(phi);
-            const z = radius * Math.cos(phi);
-
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
-
-            div.innerHTML = `
-                <img src="${sampleImage}" alt="Pic">
-                <span>I love you Borsha 💓</span>
-            `;
-
-            world.appendChild(div);
-        }
-
-        // হাত বা মাউস দিয়ে 3D ড্র্যাগ/ঘোরানোর লজিক
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let rotation = { x: 0, y: 0 };
-
-        function updateRotation() {
-            world.style.transform = `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`;
-        }
-
-        // অটোমেটিক ধীরে ধীরে ঘোরার অ্যানিমেশন
-        function autoRotate() {
-            if (!isDragging) {
-                rotation.y += 0.3;
-                updateRotation();
-            }
-            requestAnimationFrame(autoRotate);
-        }
-        autoRotate();
-
-        // টচ ও মাউস ইভেন্ট কন্ট্রোল
-        const startDrag = (x, y) => {
-            isDragging = true;
-            previousMousePosition = { x, y };
-        };
-
-        const moveDrag = (x, y) => {
-            if (!isDragging) return;
-            const deltaX = x - previousMousePosition.x;
-            const deltaY = y - previousMousePosition.y;
-
-            rotation.y += deltaX * 0.5;
-            rotation.x -= deltaY * 0.5;
-
-            updateRotation();
-            previousMousePosition = { x, y };
-        };
-
-        const stopDrag = () => { isDragging = false; };
-
-        // মাউস ইভেন্ট
-        viewport.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
-        window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
-        window.addEventListener('mouseup', stopDrag);
-
-        // মোবাইল টাচ ইভেন্ট (হাত দিয়ে ঘোরানোর জন্য)
-        viewport.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY));
-        window.addEventListener('touchmove', (e) => moveDrag(e.touches[0].clientX, e.touches[0].clientY));
-        window.addEventListener('touchend', stopDrag);
-    </script>
 </body>
 </html>
